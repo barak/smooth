@@ -89,6 +89,20 @@ Rough edges in implementation, here’s a simple one:
                 [- 5 .. 5]
 ```
 
+Captured variables sometimes require special `dmap` treatment.
+```
+*SmoothLang> atPrec 1e-9 $ (\c -> deriv (ArrD (\_ t -> c*t^2)) 3) (1/2)
+error:
+    • Couldn't match type ‘Double’ with ‘R FwdPSh.D Real d’
+      Expected type: DReal d
+        Actual type: Double
+    ...
+*SmoothLang> atPrec 1e-9 $ (\c -> deriv (ArrD (\wk t -> dmap wk c*t^2)) 3) (1/2)
+[3.0000000000, 3.0000000000]
+*SmoothLang> let c = 1/2; in atPrec 1e-9 $ deriv (ArrD (\_ t -> c*t^2)) 3
+[3.0000000000, 3.0000000000]
+```
+
 Now let’s try some [simple nesting]( http://barak.pearlmutter.net/papers/HOSC-forward-nesting.pdf ) of derivatives.
 ```
 *SmoothLang> atPrec 1e-9 $ deriv (ArrD (\_ x -> x * deriv (ArrD (\wk y -> dmap wk x * y)) 2)) 1
